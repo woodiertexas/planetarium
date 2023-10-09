@@ -31,12 +31,16 @@ public class WorldRendererMixin {
 	
 	@Unique
 	private static final Identifier JUPITER = new Identifier(MODID, "textures/environment/jupiter.png");
+	
 	@Unique
 	private static final Identifier SATURN = new Identifier(MODID, "textures/environment/saturn.png");
+	
 	@Unique
 	private static final Identifier VENUS = new Identifier(MODID, "textures/environment/venus.png");
+	
 	@Unique
 	private static final Identifier MERCURY = new Identifier(MODID, "textures/environment/mercury.png");
+	
 	@Unique
 	private static final Identifier MARS = new Identifier(MODID, "textures/environment/mars.png");
 	
