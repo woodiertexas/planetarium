@@ -30,19 +30,25 @@ public class WorldRendererMixin {
 	private @Nullable ClientWorld world;
 	
 	@Unique
+	private static final Identifier MERCURY = new Identifier(MODID, "textures/environment/mercury.png");
+	
+	@Unique
+	private static final Identifier VENUS = new Identifier(MODID, "textures/environment/venus.png");
+	
+	@Unique
+	private static final Identifier MARS = new Identifier(MODID, "textures/environment/mars.png");
+	
+	@Unique
 	private static final Identifier JUPITER = new Identifier(MODID, "textures/environment/jupiter.png");
 	
 	@Unique
 	private static final Identifier SATURN = new Identifier(MODID, "textures/environment/saturn.png");
 	
 	@Unique
-	private static final Identifier VENUS = new Identifier(MODID, "textures/environment/venus.png");
+	private static final Identifier URANUS = new Identifier(MODID, "textures/environment/uranus.png");
 	
 	@Unique
-	private static final Identifier MERCURY = new Identifier(MODID, "textures/environment/mercury.png");
-	
-	@Unique
-	private static final Identifier MARS = new Identifier(MODID, "textures/environment/mars.png");
+	private static final Identifier NEPTUNE = new Identifier(MODID, "textures/environment/neptune.png");
 	
 	@Unique
 	BufferBuilder bufferBuilder = Tessellator.getInstance().getBufferBuilder();
@@ -94,10 +100,12 @@ public class WorldRendererMixin {
 	public void stelliferous$inject(MatrixStack matrices, Matrix4f projectionMatrix, float tickDelta, Camera preStep, boolean skipRendering, Runnable preRender, CallbackInfo ci) {
 		assert world != null;
 		
+		renderPlanet(MERCURY, 3.25f, -180.0, -160.0, matrices, world, tickDelta, 125.0f, 1.80f);
+		renderPlanet(VENUS, 4.5f, -160.0, -140.0, matrices, world, tickDelta, 120.0f, 2.10f);
+		renderPlanet(MARS, 3.5f, -35.0, -35.0, matrices, world, tickDelta, 60.0f, 1.80f);
 		renderPlanet(JUPITER, 8.5f, 100.0, 0.0, matrices, world, tickDelta, -25.0f, 1.80f);
 		renderPlanet(SATURN, 11.5f, 80.0, 0.0, matrices, world, tickDelta, -15.0f, 1.80f);
-		renderPlanet(VENUS, 4.5f, -160.0, -160.0, matrices, world, tickDelta, 120.0f, 2.10f);
-		renderPlanet(MERCURY, 3.25f, -180.0, -180.0, matrices, world, tickDelta, 125.0f, 1.80f);
-		renderPlanet(MARS, 3.5f, -35.0, -35.0, matrices, world, tickDelta, 60.0f, 1.80f);
+		renderPlanet(URANUS, 4.0f, -45.0, 0.0, matrices, world, tickDelta, -60.0f, 1.80f);
+		renderPlanet(NEPTUNE, 4.0f, -20.0, 0.0, matrices, world, tickDelta, -80.0f, 1.80f);
 	}
 }
