@@ -1,4 +1,4 @@
-package io.github.woodiertexas.stelliferous.mixin;
+package io.github.woodiertexas.planetarium.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static io.github.woodiertexas.stelliferous.Stelliferous.MODID;
+import static io.github.woodiertexas.planetarium.Planetarium.MODID;
 
 @Mixin(WorldRenderer.class)
 public class WorldRendererMixin {
@@ -97,7 +97,7 @@ public class WorldRendererMixin {
 		matrices.pop();
 	}
 	@Inject(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;getStarBrightness(F)F"))
-	public void stelliferous$inject(MatrixStack matrices, Matrix4f projectionMatrix, float tickDelta, Camera preStep, boolean skipRendering, Runnable preRender, CallbackInfo ci) {
+	public void planetarium$inject(MatrixStack matrices, Matrix4f projectionMatrix, float tickDelta, Camera preStep, boolean skipRendering, Runnable preRender, CallbackInfo ci) {
 		assert world != null;
 		
 		renderPlanet(MERCURY, 3.25f, -180.0, -160.0, matrices, world, tickDelta, 125.0f, 1.80f);

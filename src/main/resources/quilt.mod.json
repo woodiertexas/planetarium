@@ -2,24 +2,24 @@
 	"schema_version": 1,
 	"quilt_loader": {
 		"group": "io.github.woodiertexas",
-		"id": "stelliferous",
+		"id": "planetarium",
 		"version": "${version}",
 		"metadata": {
-			"name": "Stelliferous",
+			"name": "Planetarium",
 			"description": "A short description of your mod.",
 			"contributors": {
 				"woodiertexas": "Author"
 			},
 			"contact": {
 				"homepage": "https://example.com/",
-				"issues": "https://github.com/woodiertexas/stelliferous/issues",
-				"sources": "https://github.com/woodiertexas/stelliferous"
+				"issues": "https://github.com/woodiertexas/planetarium/issues",
+				"sources": "https://github.com/woodiertexas/planetarium"
 			},
-			"icon": "assets/stelliferous/icon.png"
+			"icon": "assets/planetarium/icon.png"
 		},
 		"intermediate_mappings": "net.fabricmc:intermediary",
 		"entrypoints": {
-			"init": "io.github.woodiertexas.stelliferous.Stelliferous"
+			"init": "io.github.woodiertexas.planetarium.Planetarium"
 		},
 		"depends": [
 			{
@@ -36,5 +36,5 @@
 			}
 		]
 	},
-	"mixin": "stelliferous.mixins.json"
+	"mixin": "planetarium.mixins.json"
 }
