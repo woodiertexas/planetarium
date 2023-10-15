@@ -103,8 +103,8 @@ public class WorldRendererMixin {
 		renderPlanet(MERCURY, 3.25f, -180.0, -160.0, matrices, world, tickDelta, 125.0f, 1.80f);
 		renderPlanet(VENUS, 4.5f, -160.0, -140.0, matrices, world, tickDelta, 120.0f, 2.10f);
 		renderPlanet(MARS, 3.5f, -35.0, -35.0, matrices, world, tickDelta, 60.0f, 1.80f);
-		renderPlanet(JUPITER, 8.5f, 100.0, 0.0, matrices, world, tickDelta, -25.0f, 1.80f);
-		renderPlanet(SATURN, 11.5f, 80.0, 0.0, matrices, world, tickDelta, -15.0f, 1.80f);
+		renderPlanet(JUPITER, 18.5f, 130.0, -80.0, matrices, world, tickDelta, -25.0f, 1.80f);
+		renderPlanet(SATURN, 11.5f, 110.0, -60.0, matrices, world, tickDelta, -15.0f, 1.80f);
 		renderPlanet(URANUS, 4.0f, -45.0, 0.0, matrices, world, tickDelta, -60.0f, 1.80f);
 		renderPlanet(NEPTUNE, 4.0f, -20.0, 0.0, matrices, world, tickDelta, -80.0f, 1.80f);
 	}
