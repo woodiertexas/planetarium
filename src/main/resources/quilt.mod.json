@@ -6,12 +6,14 @@
 		"version": "${version}",
 		"metadata": {
 			"name": "Planetarium",
-			"description": "A short description of your mod.",
+			"description": "Renders solar system planets in Minecraft's skybox at night.",
 			"contributors": {
-				"woodiertexas": "Author"
+				"woodiertexas": "Author",
+				"gayasslily": "Planet Artist",
+				"crackers0106": "Planet Artist"
 			},
 			"contact": {
-				"homepage": "https://example.com/",
+				"homepage": "https://modrinth.com/mod/planetarium",
 				"issues": "https://github.com/woodiertexas/planetarium/issues",
 				"sources": "https://github.com/woodiertexas/planetarium"
 			},
@@ -32,7 +34,7 @@
 			},
 			{
 				"id": "minecraft",
-				"versions": ">=1.20"
+				"versions": ">=1.20.1"
 			}
 		]
 	},
