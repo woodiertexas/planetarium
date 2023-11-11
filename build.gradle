@@ -92,8 +92,4 @@ modrinth {
 		(ref != null && ref.startsWith("refs/tags/")) ?
 			"You may view the changelog at https://github.com/woodiertexas/planetarium/releases/tag/${URLEncoder.encode(ref.substring(10), StandardCharsets.UTF_8)}" :
 			"No changelog is available. Perhaps poke at https://github.com/woodiertexas/planetarium for a changelog?"
-
-	dependencies {
-		required.project "qsl"
-	}
 }
