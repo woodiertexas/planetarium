@@ -73,7 +73,7 @@ public class WorldRendererMixin {
 		matrices.translate(translateX, translateY, 0.0);
 		Matrix4f matrix4f = matrices.peek().getModel();
 		
-		if (world.getTimeOfDay() >= 11800 && world.getTimeOfDay() <= 24000) {
+		if (world.getTimeOfDay() % 24000L >= 11800) {
 			RenderSystem.setShaderTexture(0, planet);
 			bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
 			bufferBuilder.vertex(matrix4f, -planetSize, -100.0F, planetSize).uv(0.0F, 0.0F).next();
