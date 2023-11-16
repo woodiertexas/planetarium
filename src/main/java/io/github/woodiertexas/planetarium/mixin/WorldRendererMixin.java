@@ -51,15 +51,15 @@ public class WorldRendererMixin {
 	private static final Identifier NEPTUNE = new Identifier(MODID, "textures/environment/neptune.png");
 	
 	@Unique
-	BufferBuilder bufferBuilder = Tessellator.getInstance().getBufferBuilder();
+	private final BufferBuilder bufferBuilder = Tessellator.getInstance().getBufferBuilder();
 	
 	
 	/**
 	 * Renders a planet texture in the Minecraft skybox
 	 * @param planet the planet texture to use
 	 * @param planetSize how big the planet is
-	 * @param translateX 
-	 * @param translateY
+	 * @param translateX the X position in the sky
+	 * @param translateY the Y position in the sky
 	 * @param matrices the MatrixStack
 	 * @param world the World
 	 * @param tickDelta time between ticks
@@ -67,7 +67,7 @@ public class WorldRendererMixin {
 	 * @param brightness how bright the planet is
 	 */
 	@Unique
-	public void renderPlanet(Identifier planet, float planetSize, double translateX, double translateY, MatrixStack matrices, World world, float tickDelta, float planetPhase, float brightness) {
+	private void renderPlanet(Identifier planet, float planetSize, double translateX, double translateY, MatrixStack matrices, World world, float tickDelta, float planetPhase, float brightness) {
 		matrices.push();
 		matrices.multiply(Axis.X_POSITIVE.rotationDegrees(world.getSkyAngle(tickDelta) + planetPhase));
 		matrices.translate(translateX, translateY, 0.0);
@@ -97,7 +97,7 @@ public class WorldRendererMixin {
 		matrices.pop();
 	}
 	@Inject(method = "renderSky", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;getStarBrightness(F)F"))
-	public void planetarium$inject(MatrixStack matrices, Matrix4f projectionMatrix, float tickDelta, Camera preStep, boolean skipRendering, Runnable preRender, CallbackInfo ci) {
+	private void renderPlanets(MatrixStack matrices, Matrix4f projectionMatrix, float tickDelta, Camera preStep, boolean skipRendering, Runnable preRender, CallbackInfo ci) {
 		assert world != null;
 		
 		renderPlanet(MERCURY, 7f, -180.0, -160.0, matrices, world, tickDelta, 125.0f, 1.80f);
