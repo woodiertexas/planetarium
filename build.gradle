@@ -74,6 +74,10 @@ jar {
 	from('LICENSE') {
 		rename { "${it}_${base.archivesName.get()}" }
 	}
+
+	from('LICENSE-ASSETS') {
+		rename { "${it}_${base.archivesName.get()}" }
+	}
 }
 
 modrinth {
