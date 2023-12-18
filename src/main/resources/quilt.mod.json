@@ -20,9 +20,7 @@
 			"icon": "assets/planetarium/icon.png"
 		},
 		"intermediate_mappings": "net.fabricmc:intermediary",
-		"entrypoints": {
-			"init": "io.github.woodiertexas.planetarium.Planetarium"
-		},
+		"entrypoints": {},
 		"depends": [
 			{
 				"id": "quilt_loader",
