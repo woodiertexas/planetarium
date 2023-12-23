@@ -75,7 +75,7 @@ jar {
 		rename { "${it}_${base.archivesName.get()}" }
 	}
 
-	from('LICENSE-ASSETS') {
+	from('LICENSE-ASSETS.md') {
 		rename { "${it}_${base.archivesName.get()}" }
 	}
 }
