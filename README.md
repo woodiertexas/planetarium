@@ -1,5 +1,5 @@
 ## About
-The mod simply renders the solar system planets in Minecraft's skybox during the night. In a way, the MC skybox is a planetarium if you think about it.
+Planetarium renders planets in Minecraft's sky during nighttime; similar to how a physical world planetarium functions.
 The planet textures are made by @Crackers0106 (PR https://github.com/woodiertexas/planetarium/pull/1) and @lxly9 (PR https://github.com/woodiertexas/planetarium/pull/2).
 
 The project source is licensed under the MIT license whereas the [project assets](https://github.com/woodiertexas/planetarium/tree/1.20.1/src/main/resources/assets/planetarium) are licensed under the
