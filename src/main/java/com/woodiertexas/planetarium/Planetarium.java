@@ -18,7 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class Planetarium {
 	public static final Logger LOGGER = LoggerFactory.getLogger("Planetarium");
-	public static final String MOD_ID = "com/woodiertexas/planetarium";
+	public static final String MOD_ID = "planetarium";
 
 	/**
 	 * @param matrices   The matrix stack for rendering.
