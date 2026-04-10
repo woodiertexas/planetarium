@@ -9,47 +9,48 @@ import com.google.gson.JsonElement;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
+import com.woodiertexas.planetarium.PlanetInfo;
+import com.woodiertexas.planetarium.Planetarium;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
+import net.minecraft.util.profiling.ProfilerFiller;
 
-import net.minecraft.resource.JsonDataLoader;
-import net.minecraft.resource.ResourceManager;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.profiler.Profiler;
-
-public class PlanetManager extends JsonDataLoader implements IdentifiableResourceReloadListener {
+public class PlanetManager extends SimpleJsonResourceReloadListener implements IdentifiableResourceReloadListener {
 	private static final Gson GSON = new GsonBuilder().create();
-	private Map<Identifier, PlanetInfo> planets;
+	private Map<ResourceLocation, com.woodiertexas.planetarium.PlanetInfo> planets;
 
 	public PlanetManager() {
-		super(GSON, Planetarium.MOD_ID + "/planets");
+		super(GSON, com.woodiertexas.planetarium.Planetarium.MOD_ID + "/planets");
 	}
 
-	public Map<Identifier, PlanetInfo> getPlanets() {
+	public Map<ResourceLocation, com.woodiertexas.planetarium.PlanetInfo> getPlanets() {
 		return planets;
 	}
 
 	@Override
-	protected void apply(Map<Identifier, JsonElement> cache, ResourceManager manager, Profiler profiler) {
-		Map<Identifier, PlanetInfo> planets = new HashMap<>();
+	protected void apply(Map<ResourceLocation, JsonElement> cache, ResourceManager manager, ProfilerFiller profiler) {
+		Map<ResourceLocation, com.woodiertexas.planetarium.PlanetInfo> planets = new HashMap<>();
 
 		profiler.push("Load Planets");
-		for (Map.Entry<Identifier, JsonElement> resourceEntry : cache.entrySet()) {
-			Identifier id = resourceEntry.getKey();
-			DataResult<Pair<PlanetInfo, JsonElement>> result = PlanetInfo.CODEC.decode(JsonOps.INSTANCE, resourceEntry.getValue());
+		for (Map.Entry<ResourceLocation, JsonElement> resourceEntry : cache.entrySet()) {
+			ResourceLocation id = resourceEntry.getKey();
+			DataResult<Pair<com.woodiertexas.planetarium.PlanetInfo, JsonElement>> result = com.woodiertexas.planetarium.PlanetInfo.CODEC.decode(JsonOps.INSTANCE, resourceEntry.getValue());
 
 			if (result.error().isPresent()) {
-				Planetarium.LOGGER.error(String.format("Could not parse planet file %s.\nReason: %s", id, result.error().get().message()));
+				com.woodiertexas.planetarium.Planetarium.LOGGER.error(String.format("Could not parse planet file %s.\nReason: %s", id, result.error().get().message()));
 				continue;
 			}
 
 			PlanetInfo planetInfo = result.result().get().getFirst();
 
 			if (manager.getResource(planetInfo.getTexture(id)).isEmpty()) {
-				Planetarium.LOGGER.error("No texture found for planet {}, skipping.", id);
+				com.woodiertexas.planetarium.Planetarium.LOGGER.error("No texture found for planet {}, skipping.", id);
 				continue;
 			}
 
-			Planetarium.LOGGER.debug("Adding Planet {}: {}", id, planetInfo);
+			com.woodiertexas.planetarium.Planetarium.LOGGER.debug("Adding Planet {}: {}", id, planetInfo);
 			planets.put(id, planetInfo);
 		}
 
@@ -59,7 +60,7 @@ public class PlanetManager extends JsonDataLoader implements IdentifiableResourc
 	}
 
 	@Override
-	public Identifier getFabricId() {
-		return Identifier.of(Planetarium.MOD_ID, "planet_reloader");
+	public ResourceLocation getFabricId() {
+		return ResourceLocation.fromNamespaceAndPath(Planetarium.MOD_ID, "planet_reloader");
 	}
 }
