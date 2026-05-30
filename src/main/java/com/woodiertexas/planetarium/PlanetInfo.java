@@ -2,10 +2,9 @@ package com.woodiertexas.planetarium;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
-import net.minecraft.util.Identifier;
-
 import java.util.Optional;
+
+import net.minecraft.resources.Identifier;
 
 /**
  * @param procession       How far along in orbit the planet is.
@@ -28,11 +27,11 @@ public record PlanetInfo(float procession, float tilt, float inclination, float 
 	);
 
 	public Identifier getTexture(Identifier id) {
-		// Identifier.of(id.getNamespace, "textures/planets/" + id.getPath() + ".png");
+		id = Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath().replace(".json", ""));
 		if (texture_override.isEmpty()) {
-			return id.withPrefix("textures/planetarium/planets/").extendPath(".png");
+			return id.withPrefix("textures/").withSuffix(".png");
 		}
 		
-		return texture_override.get().withPrefix("textures/").extendPath(".png");
+		return texture_override.get().withPrefix("textures/").withSuffix(".png");
 	}
 }
