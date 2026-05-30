@@ -1,24 +1,70 @@
 package com.woodiertexas.planetarium;
 
+import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.blaze3d.systems.RenderPass;
+import com.mojang.blaze3d.textures.FilterMode;
 import com.woodiertexas.planetarium.PlanetInfo;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Mth;
+import net.minecraft.world.attribute.EnvironmentAttributes;
+import net.minecraft.world.level.Level;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Axis;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.ResourceLocation;
+
+import java.lang.ref.Cleaner;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.OptionalInt;
 
 public class Planetarium {
 	public static final Logger LOGGER = LoggerFactory.getLogger("Planetarium");
 	public static final String MOD_ID = "planetarium";
+
+	private static Map<Identifier, PlanetStorage> planets = new HashMap<>();
+
+	public static void deleteAll() {
+		planets.values().forEach(i -> i.vertices().close());
+		planets.clear();
+	}
+
+
+
+	public static void preparePlanet(Map.Entry<Identifier, PlanetInfo> entry) {
+		if (planets.containsKey(entry.getKey())) {
+			return;
+		}
+
+		var planetInfo = entry.getValue();
+
+		BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+		bufferBuilder.addVertex(-planetInfo.size(), 99.0F, -planetInfo.size()).setUv(0.0F, 0.0F);
+		bufferBuilder.addVertex(planetInfo.size(), 99.0F, -planetInfo.size()).setUv(1.0F, 0.0F); // u: 1.0
+		bufferBuilder.addVertex(planetInfo.size(), 99.0F, planetInfo.size()).setUv(1.0F, 1.0F); // u: 1.0, v: 1.0
+		bufferBuilder.addVertex(-planetInfo.size(), 99.0F, planetInfo.size()).setUv(0.0F, 1.0F); // v: 1.0
+
+		var meshData = bufferBuilder.buildOrThrow();
+
+		PlanetStorage storage = new PlanetStorage(planetInfo, RenderSystem.getDevice().createBuffer(() -> "Planet " + entry.getKey(), GpuBuffer.USAGE_VERTEX | GpuBuffer.USAGE_COPY_DST, meshData.vertexBuffer()));
+
+		meshData.close();
+
+		planets.put(entry.getKey(), storage);
+	}
 
 	/**
 	 * @param matrices   The matrix stack for rendering.
@@ -27,41 +73,20 @@ public class Planetarium {
 	 * @param tickDelta  Time between ticks.
 	 * @param world      The client world to render in.
 	 */
-	public static void renderPlanet(PoseStack matrices, ResourceLocation id, PlanetInfo planetInfo, float tickDelta, ClientLevel world) {
-		matrices.pushPose();
+	public static void renderPlanet(RenderPass pass, Identifier id, PlanetInfo planetInfo, float tickDelta, ClientLevel world) {
+		var storage = planets.get(id);
+
 		
-		// First, line planet up where the sun is in the sky
-		matrices.mulPose(Axis.YP.rotationDegrees(90.0F));
-		
-		// Second, change the orbital tilt of the planet
-		matrices.mulPose(Axis.YP.rotationDegrees(planetInfo.tilt())); // tilt
-		
-		// Third, set the angle of the planet in the sky and offset it.
-		matrices.mulPose(Axis.XP.rotationDegrees(-world.getTimeOfDay(tickDelta) * 360.0F + planetInfo.procession())); // procession
-		
-		// Fourth, set the inclination of the planet.
-		matrices.mulPose(Axis.ZP.rotationDegrees(planetInfo.inclination())); // inclination
-		
-		// Finally, change the rotation of the planet texture.
-		matrices.mulPose(Axis.YP.rotationDegrees(planetInfo.texture_rotation()));
-		
-		if (world.getDayTime() % 24000L >= 11800) {
-			Matrix4f matrix4f = matrices.last().pose();
-			RenderSystem.setShaderTexture(0, planetInfo.getTexture(id));
-			BufferBuilder bufferBuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-			bufferBuilder.addVertex(matrix4f, -planetInfo.size(), 99.0F, -planetInfo.size()).setUv(0.0F, 0.0F);
-			bufferBuilder.addVertex(matrix4f, planetInfo.size(), 99.0F, -planetInfo.size()).setUv(1.0F, 0.0F); // u: 1.0
-			bufferBuilder.addVertex(matrix4f, planetInfo.size(), 99.0F, planetInfo.size()).setUv(1.0F, 1.0F); // u: 1.0, v: 1.0
-			bufferBuilder.addVertex(matrix4f, -planetInfo.size(), 99.0F, planetInfo.size()).setUv(0.0F, 1.0F); // v: 1.0
+
+		if (world.getDefaultClockTime() % 24000L >= 11800) {
+			var tex = Minecraft.getInstance().getTextureManager().getTexture(planetInfo.getTexture(id));
 			
-			float rainGradient = 1.0f - world.getRainLevel(tickDelta);
-			float transparency = 2 * world.getStarBrightness(tickDelta) * rainGradient;
-			if (transparency > 0.0f) {
-				RenderSystem.setShaderColor(transparency, transparency, transparency, transparency);
-			}
-			
-			BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
+			pass.bindTexture("Sampler0", tex.getTextureView(), RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
+
+			pass.setVertexBuffer(0, storage.vertices());
+			pass.setIndexBuffer(RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS).getBuffer(6), RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS).type());
+
+			pass.drawIndexed(0, 0, 6, 1);
 		}
-		matrices.popPose();
 	}
 }
