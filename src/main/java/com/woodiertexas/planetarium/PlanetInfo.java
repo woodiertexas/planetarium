@@ -27,7 +27,6 @@ public record PlanetInfo(float procession, float tilt, float inclination, float 
 	);
 
 	public Identifier getTexture(Identifier id) {
-		// ResourceLocation.of(id.getNamespace, "textures/planets/" + id.getPath() + ".png");
 		id = Identifier.fromNamespaceAndPath(id.getNamespace(), id.getPath().replace(".json", ""));
 		if (texture_override.isEmpty()) {
 			return id.withPrefix("textures/").withSuffix(".png");

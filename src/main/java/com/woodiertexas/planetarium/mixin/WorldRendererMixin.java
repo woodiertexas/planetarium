@@ -8,19 +8,12 @@ import com.mojang.math.Axis;
 import com.woodiertexas.planetarium.PlanetInfo;
 import com.woodiertexas.planetarium.PlanetManager;
 import com.woodiertexas.planetarium.Planetarium;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
-import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.RenderBuffers;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.SkyRenderer;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
-import net.minecraft.client.renderer.state.GameRenderState;
 import net.minecraft.client.renderer.state.level.SkyRenderState;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
@@ -62,18 +55,19 @@ public class WorldRendererMixin {
 		return (float) (frac * 2.0 + (0.5 - Math.cos(frac * Math.PI) / 2.0)) / 3.0F;
 	}
 
+	private static final Minecraft mcClient = Minecraft.getInstance();
 	@Inject(method = "lambda$addSkyPass$0", at = @At(value = "RETURN"))
 	private static void renderCelestialObjects(GpuBufferSlice skyFog, SkyRenderState state, SkyRenderer skyRenderer, CallbackInfo ci) {
 		PoseStack matrices = new PoseStack();
-		matrices.mulPose(Minecraft.getInstance().gameRenderer.getGameRenderState().levelRenderState.cameraRenderState.viewRotationMatrix);
+		matrices.mulPose(mcClient.gameRenderer.getGameRenderState().levelRenderState.cameraRenderState.viewRotationMatrix);
 
 		var array = planetarium$planetManager.getPlanets().entrySet().toArray(Map.Entry[]::new);
 		var array2 = new GpuBufferSlice[array.length];
 
-		var tickDelta = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
+		var tickDelta = mcClient.getDeltaTracker().getGameTimeDeltaPartialTick(false);
 
-		float rainGradient = 1.0f - Minecraft.getInstance().level.getRainLevel(tickDelta);
-		float transparency = 2 * Minecraft.getInstance().gameRenderer.getMainCamera().attributeProbe().getValue(EnvironmentAttributes.STAR_BRIGHTNESS, tickDelta) * rainGradient;
+		float rainGradient = 1.0f - mcClient.level.getRainLevel(tickDelta);
+		float transparency = 2 * mcClient.gameRenderer.getMainCamera().attributeProbe().getValue(EnvironmentAttributes.STAR_BRIGHTNESS, tickDelta) * rainGradient;
 
 		for (int i = 0; i < array.length; i++) {
 			Map.Entry<Identifier, PlanetInfo> entry = array[i];
@@ -90,7 +84,7 @@ public class WorldRendererMixin {
 			matrices.mulPose(Axis.YP.rotationDegrees(planetInfo.tilt())); // tilt
 
 			// Third, set the angle of the planet in the sky and offset it.
-			matrices.mulPose(Axis.XP.rotationDegrees(-getTimeOfDay(Minecraft.getInstance().level) * 360.0F + planetInfo.procession())); // procession
+			matrices.mulPose(Axis.XP.rotationDegrees(-getTimeOfDay(mcClient.level) * 360.0F + planetInfo.procession())); // procession
 
 			// Fourth, set the inclination of the planet.
 			matrices.mulPose(Axis.ZP.rotationDegrees(planetInfo.inclination())); // inclination
@@ -101,7 +95,7 @@ public class WorldRendererMixin {
 			array2[i] = RenderSystem.getDynamicUniforms()
 				.writeTransform(matrices.last().pose(), transparency <= 0.0f ? new Vector4f(1.0F, 1.0F, 1.0F, 1.0f) : new Vector4f(transparency, transparency, transparency, transparency), new Vector3f(), new Matrix4f());
 
-			var tex = Minecraft.getInstance().getTextureManager().getTexture(planetInfo.getTexture(entry.getKey())); // This acts as preloading, and is required.
+			var tex = mcClient.getTextureManager().getTexture(planetInfo.getTexture(entry.getKey())); // This acts as preloading, and is required.
 
 			matrices.popPose();
 		}

@@ -1,41 +1,27 @@
 package com.woodiertexas.planetarium;
 
 import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.RenderPass;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.textures.FilterMode;
-import com.woodiertexas.planetarium.PlanetInfo;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.Mth;
-import net.minecraft.world.attribute.EnvironmentAttributes;
-import net.minecraft.world.level.Level;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import com.mojang.math.Axis;
-import net.minecraft.client.multiplayer.ClientLevel;
-
-import java.lang.ref.Cleaner;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.OptionalInt;
 
 public class Planetarium {
 	public static final Logger LOGGER = LoggerFactory.getLogger("Planetarium");
 	public static final String MOD_ID = "planetarium";
 
-	private static Map<Identifier, PlanetStorage> planets = new HashMap<>();
+	private static final Map<Identifier, PlanetStorage> planets = new HashMap<>();
 
 	public static void deleteAll() {
 		planets.values().forEach(i -> i.vertices().close());
@@ -67,7 +53,7 @@ public class Planetarium {
 	}
 
 	/**
-	 * @param matrices   The matrix stack for rendering.
+	 * @param pass       The rendering pass.
 	 * @param id         The id for the planet. (Ex: Mercury, Venus, Earth, and so on)
 	 * @param planetInfo The planet data.
 	 * @param tickDelta  Time between ticks.
@@ -75,9 +61,7 @@ public class Planetarium {
 	 */
 	public static void renderPlanet(RenderPass pass, Identifier id, PlanetInfo planetInfo, float tickDelta, ClientLevel world) {
 		var storage = planets.get(id);
-
 		
-
 		if (world.getDefaultClockTime() % 24000L >= 11800) {
 			var tex = Minecraft.getInstance().getTextureManager().getTexture(planetInfo.getTexture(id));
 			
